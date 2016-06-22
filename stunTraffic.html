@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <meta http - equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta charset="utf-8">
     <title> STUN traffic demo </title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,27 +10,33 @@
 
 <body>
     <h2> This is STUN traffic demo </h2>
+    <p> grab traffic with: sudo tcpdump -i en1 -s 0 -w /tmp/dump.pcap 'port 10053' </p>
 
     <script>
-        var pc;
+        var pc = new Array(3);
+        var i = 0;
+
+        function setupPC(lpc) {
+            lpc.createDataChannel("myData");
+            lpc.createOffer().then(function(offer) {
+                return lpc.setLocalDescription(offer);
+            });
+        }
 
         var configuration = {
             iceServers: [{
                 urls: 'stun:10.1.2.3:10053'
             }]
         };
+        for (i = 0; i < pc.length; i += 1) {
+            if (navigator.mozGetUserMedia) {
+                pc[i] = new RTCPeerConnection(configuration);
+            } else { // assume it is chrome 
+                pc[i] = new webkitRTCPeerConnection(configuration);
+            }
 
-        if (navigator.mozGetUserMedia) {
-            pc = new RTCPeerConnection(configuration);
-        } else {
-            //assume it is chrome
-            pc = new webkitRTCPeerConnection(configuration);
+            setupPC(pc[i]);
         }
-
-        pc.createDataChannel("myData");
-        pc.createOffer().then(function(offer) {
-            return pc.setLocalDescription(offer);
-        });
     </script>
 
 </body>
