@@ -9,7 +9,7 @@
 </head>
 
 <body>
-    <h2> Demo </h2>
+    <h2> This is STUN traffic demo </h2>
 
     <script>
         var pc;
@@ -19,7 +19,14 @@
                 urls: 'stun:10.1.2.3:10053'
             }]
         };
-        pc = new RTCPeerConnection(configuration);
+
+        if (navigator.mozGetUserMedia) {
+            pc = new RTCPeerConnection(configuration);
+        } else {
+            //assume it is chrome
+            pc = new webkitRTCPeerConnection(configuration);
+        }
+
         pc.createDataChannel("myData");
         pc.createOffer().then(function(offer) {
             return pc.setLocalDescription(offer);
