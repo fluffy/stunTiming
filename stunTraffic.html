@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http - equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title> STUN traffic demo </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+    <h2> Demo </h2>
+
+    <script>
+        var pc;
+
+        var configuration = {
+            iceServers: [{
+                urls: 'stun:10.1.2.3:10053'
+            }]
+        };
+        pc = new RTCPeerConnection(configuration);
+        pc.createDataChannel("myData");
+        pc.createOffer().then(function(offer) {
+            return pc.setLocalDescription(offer);
+        });
+    </script>
+
+</body>
+
+</html>
