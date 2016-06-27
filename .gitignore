@@ -22,3 +22,10 @@ _testmain.go
 *.exe
 *.test
 *.prof
+
+
+draft-jennings-ice-rtcweb-timing-??.html
+draft-jennings-ice-rtcweb-timing-??.txt
+draft-jennings-ice-rtcweb-timing-??.xml
+
+
