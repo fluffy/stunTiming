@@ -1,7 +1,7 @@
 %%%
 
     #
-    # STUN TIming 
+    # STUN Timing 
     #
     # Generation tool chain:
     #   mmark (https://github.com/miekg/mmark)
@@ -9,7 +9,7 @@
     #
 
     Title = "ICE and STUN Timing Experiments for WebRTC"
-    abbrev = "Double SRTP"
+    abbrev = "ICE Timing Experiments"
     category = "std"
     docName = "draft-jennings-ice-rtcweb-timing-00"
     ipr= "trust200902"
@@ -55,35 +55,36 @@ impact on bandwidth usage be.
 # Background
 
 A web page using WebRTC can form multiple PeerConnections. Each one of
-these starts an ICE process that initates STUN transactions towards
-varios IP and ports that are specified by the JavaScrpt of the web
+these starts an ICE process that imitates STUN transactions towards
+varios IP and ports that are specified by the Javascript of the web
 page.
 
 Browser do not limit the number of PeerConnections but do limit the
-totall amount of STUN traffic that is sent with no congetion
+totall amount of STUN traffic that is sent with no congestion
 controll. This draft assumes that browsers will limit this traffic to
 250kbps thought right now implementation seems to exceed that when
 measured over an 100ms window. 
 
 Each PeerConnection starts a new STUN transaction periodically until
 all the iCE testing is done. RFC5245 limits this to be 20ms or more
-while draft-ietf-ice-rfc5245bis proposes moves the miimium time to 5
-ms. Retransmition for previos stun transaction can be happening in
-parrallel with this.
+while draft-ietf-ice-rfc5245bis proposes moves the minimum time to 5
+ms. Retransmission for previos stun transaction can be happening in
+parallel with this.
 
-The STUN specifiction [RFC5389] specifies 7 retransmition each one
-doubleing in timeout starting with a 500ms retransmiton
-time unless certian conditions are meant. This largely ignored and
-instead system do 7 retransmtions with a retransmition time starting
-at 100ms and doubling up to a limit of TODO ms. 
+The STUN specification [RFC5389] specifies 7 retransmission each one
+doubling in timeout starting with a 500ms retransmission time unless
+certain conditions are meant. This was only put in the RFC to make the
+IESG happy and is largely ignored and instead system do 7
+retransmissions with a retransmission time starting at 100ms and
+doubling every retransmission up to a limit of TODO ms.
 
-The size of STUN packets can vary based on a vareity of opions
+The size of STUN packets can vary based on a variety of options
 selected but the packets being used by browser today are about 70 TODO
 bytes for the the requests. 
 
 As the speed of the pacing is speeded up to 5ms, it increases the
 number of new mappings the NAT needs to create as well as increasing
-the non congestion coontrolled bandwidht used by by the browser. The
+the non congestion controlled bandwidth used by by the browser. The
 rest of this draft looks at what sort of issue may or may not come out
 of this.
 
@@ -92,22 +93,22 @@ of this.
 A common design for small conferences is to have a full mesh of media
 formed between all participants where each participants sends their
 audio and video to all other participants who mix and render the
-results. If there are 9 people on a confernce call and a 10th one
-joins, one design might be for the new peron to in parallel fourm 9
-new PeerConnections - one to each existing partipcipant.
+results. If there are 9 people on a conference call and a 10th one
+joins, one design might be for the new person to in parallel form 9
+new PeerConnections - one to each existing participant.
 
 This might result in 9 ICE machine each starting a new STUN
-transaction every 5 ms. Assuming no retransmitons, that is a new NAT
+transaction every 5 ms. Assuming no retransmissions, that is a new NAT
 mapping every 5ms / 9 ice machine = 0.5 ms and about 5 ms / 9 ice
-machine * 70 bytes / packet * 8 bits per byte = TODO kbps. WIth
-hat retransmtion it can get up to significnatly more.
+machine * 70 bytes / packet * 8 bits per byte = TODO kbps. Without
+retransmission it can get up to significantly more.
 
 An alternative design would be to form these connection to the 9
-people in the confernce sequentially. Given the bandwith limitations
+people in the conference sequentially. Given the bandwith limitations
 and other issues, later parts of this draft propose that if we move
-the pacing to 5ms, the WebRTC drafts proabbkly need to cuation
-developers that parrallel impltentation wtih these many candiates are
-likely to have falures.
+the pacing to 5ms, the WebRTC drafts probably need to caution
+developers that parallel implementation with these many candidates are
+likely to have failures.
 
 # Nat Connection Rate Results
 
@@ -116,7 +117,7 @@ NAT can create. The 20ms limit in [RFC5389] was based on going faster
 than than exceeded the rate of which NATs widely deployed at that time
 could create new mappings.
 
-The test were run on the very latest models NATs from Asus, Dlink,
+The test were run on the very latest models NATs from Asus, DLink,
 Netgear, and Linksys. These four vendors were selected due to the
 large market share they represent. This is not at all representative
 of what is actually deployed in the field today but represents what we
@@ -152,25 +153,112 @@ to vast increase in CPU speed of CPUs in the NATs vs the speed in the
 NATs tested in 2005 in [draft-jennings-behave-test-results-00].
 
 This implies that as long as there or less than 5 or 10 PC doing ICE
-in parallel in a given brwser, we do not anticipate problems on the
-texted nats moving the ICE pacing to 5ms. 
+in parallel in a given browser, we do not anticipate problems on the
+texted nats moving the ICE pacing to 5ms.
 
 
 # ICE Bandwidth Usage
 
-## History of RFCb5389
+## History of RFC 5389
 
-## TODO 
+At the time [RFC5389] was done, the argument made was it was OK for
+STUN to use as much non congestion controlled bandwidth as RTP audio
+was likely to do as the STUN was merely setting up a connection for
+RTP. The premise was the networks that IP Phones were used on were
+designed to have enough bandwidth to reasonable work with the audio
+codecs being used and that the RTP audio was not elastic and not
+congestion controlled in most implementations. There was a form of
+"User congestion controll" in that if your phone call sounded like
+crap because it was having 10% packet loss, the user ended the call,
+tried again, and if it was till bad gave up and stopped causing
+congestion.
 
+Since that time the number of candidates used in ICE has
+siginpificantly increased, the range of networks ICE is used over has
+expanded, and uses have increased. We have also seem much more
+widespread use of FEC that that allows high packet loss rate with no
+impact on the end user perception of media quality. In WebRC there
+applications ushc as file sharing and background P2P backup that form
+data channel connecting using ICE with no human interaction. ICE in
+pratical usage has expanded beyond a tool for IP phones to the
+preferred tool on the internet for setting up end to end connection.
+
+
+
+## Bandwidth Usage
+
+To prevent things like DDOS attacks on DNS servers, WebRTC browser
+limit the non congestion controlled bandwidth of STUN transaction to
+an unspecified number but seems that browsers currently plan to set
+this to 250 kbps. An advertisement running on a popular webpage can
+create as many PeerConnections as it wants and specify the IP and port
+to send all the STUN transaction to. These all send traffic which the
+browser limits by dropping packets that exceed the global limit for
+the browser.
+
+## What should global rate limit be
+
+It is clear that sending 250 kbps on 80 kbps edge cellular connection
+severely impacts other application on that connection and is not even
+remotely close to TCP friendly. In the age of cellular wifi hot spots
+and highly variable backhaul, the browser has no pre installed idea of
+what the available bandwith is.
+
+This draft is not in anyway sugesting what the bandwidth limit should
+be but it is looking at what are the implication to ICE timing based
+on that number. The limit has security implication in that browser
+loading Javascript in paid advertisements on popular web sides could
+use this to send traffic to DDOS an UDP server. The limit has
+transport implication in how it interacts with other traffic on the
+networks that are close to or less than this limit.
+
+
+## Rate Limits
+
+This limit to drop packets if the global bandwidth is exceeded means
+that applications need to stay under this rate limit or the loss of
+STUN packets will cause ICE to start thinking connections which are
+valid do not work. At 250 kbps, split across say two web pages, with
+no retransmission, each web page can from a new STUN transaction
+roughly ever ( 70 * 8 ) / (250000 / 2 )= 4.48 ms. This implies that
+really only one Peer Connection can be doing ICE at at time if the
+pacing is moved to 5 ms.
+
+If the rate limit was set more around compressed narrowband voice
+bitrates, (12 to 40 kbps depending on who you ask), it is clear that
+5ms timing fro ICE is far too low and will cause many ICE packet to be
+arbitrarily discarded by the browser rate limit before even being sent
+on the wire.
+
+
+# Recommendations
+
+The ICE and RTCWeb Transport documents should specify a clear upper
+bound on the amount of non congestion controlled traffic an browser or
+applications should be limited to. The transportand perhaps security
+area should provide advice on what that number should be. WebRTC
+basically application work better the larger that number is at the
+expense of other applications running on the same congested links.
+
+Given the way that setting the ICE pacing to be too fast can cause ICE
+to fail, The Javascript application in WebRTC should have a way to tell
+the browser what ICE pacing to use with a minimum enforced by the
+browser.
 
 # Conclusions
 
 The speed of NATs mapping creation going forward in the future is
 likely adequate to move the pacing to 5ms. However applications that
-create parallel peer connections on sitirtuatio where more than a
-handfull of PeerConnections are funnin in pararrelel in the same
-rowwser (poisbly in differnt tabs or web pages) need to be avoided.
+create parallel peer connections or situations where more than a
+handfull of PeerConnections are forming in parallel in the same
+browser (possibly in different tabs or web pages) need to be avoided.
 
+From a bandwidth limit point of view, if the bandwidth is limited at
+250 kbps, a 5ms timing will work for a single PeerConnection but not
+much more than that. The specification should make developers aware of
+this limitation. If the non congestion controlled bandwidth limit is
+less than 250 kbps, a 5ms timing is likely too small to work
+reliably.
 
 
 # Acknowledgments
@@ -178,3 +266,12 @@ rowwser (poisbly in differnt tabs or web pages) need to be avoided.
 Many thanks to review from ...
 
 {backmatter}
+
+# Appendix A - Bandwidth testing
+
+The following example web page was used to measure how much bandwith a
+browser will send to an arbitrary IP and port when getting 100% packet
+loss to that destination.
+
+TODO - add program
+
