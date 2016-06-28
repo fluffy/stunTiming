@@ -56,19 +56,19 @@ impact on bandwidth usage be.
 
 A web page using WebRTC can form multiple PeerConnections. Each one of
 these starts an ICE process that imitates STUN transactions towards
-varios IP and ports that are specified by the Javascript of the web
+various IP and ports that are specified by the Javascript of the web
 page.
 
 Browser do not limit the number of PeerConnections but do limit the
-totall amount of STUN traffic that is sent with no congestion
-controll. This draft assumes that browsers will limit this traffic to
+total amount of STUN traffic that is sent with no congestion
+control. This draft assumes that browsers will limit this traffic to
 250kbps thought right now implementation seems to exceed that when
 measured over an 100ms window. 
 
 Each PeerConnection starts a new STUN transaction periodically until
 all the iCE testing is done. RFC5245 limits this to be 20ms or more
 while draft-ietf-ice-rfc5245bis proposes moves the minimum time to 5
-ms. Retransmission for previos stun transaction can be happening in
+ms. Retransmission for previous stun transaction can be happening in
 parallel with this.
 
 The STUN specification [RFC5389] specifies 7 retransmission each one
@@ -104,7 +104,7 @@ machine * 70 bytes / packet * 8 bits per byte = TODO kbps. Without
 retransmission it can get up to significantly more.
 
 An alternative design would be to form these connection to the 9
-people in the conference sequentially. Given the bandwith limitations
+people in the conference sequentially. Given the bandwidth limitations
 and other issues, later parts of this draft propose that if we move
 the pacing to 5ms, the WebRTC drafts probably need to caution
 developers that parallel implementation with these many candidates are
@@ -154,7 +154,7 @@ NATs tested in 2005 in [draft-jennings-behave-test-results-00].
 
 This implies that as long as there or less than 5 or 10 PC doing ICE
 in parallel in a given browser, we do not anticipate problems on the
-texted nats moving the ICE pacing to 5ms.
+texted NATs moving the ICE pacing to 5ms.
 
 
 # ICE Bandwidth Usage
@@ -168,7 +168,7 @@ RTP. The premise was the networks that IP Phones were used on were
 designed to have enough bandwidth to reasonable work with the audio
 codecs being used and that the RTP audio was not elastic and not
 congestion controlled in most implementations. There was a form of
-"User congestion controll" in that if your phone call sounded like
+"User congestion control" in that if your phone call sounded like
 crap because it was having 10% packet loss, the user ended the call,
 tried again, and if it was till bad gave up and stopped causing
 congestion.
@@ -178,9 +178,9 @@ siginpificantly increased, the range of networks ICE is used over has
 expanded, and uses have increased. We have also seem much more
 widespread use of FEC that that allows high packet loss rate with no
 impact on the end user perception of media quality. In WebRC there
-applications ushc as file sharing and background P2P backup that form
+applications such as file sharing and background P2P backup that form
 data channel connecting using ICE with no human interaction. ICE in
-pratical usage has expanded beyond a tool for IP phones to the
+practical usage has expanded beyond a tool for IP phones to the
 preferred tool on the internet for setting up end to end connection.
 
 
@@ -202,9 +202,9 @@ It is clear that sending 250 kbps on 80 kbps edge cellular connection
 severely impacts other application on that connection and is not even
 remotely close to TCP friendly. In the age of cellular wifi hot spots
 and highly variable backhaul, the browser has no pre installed idea of
-what the available bandwith is.
+what the available bandwidth is.
 
-This draft is not in anyway sugesting what the bandwidth limit should
+This draft is not in anyway suggesting what the bandwidth limit should
 be but it is looking at what are the implication to ICE timing based
 on that number. The limit has security implication in that browser
 loading Javascript in paid advertisements on popular web sides could
@@ -235,7 +235,7 @@ on the wire.
 
 The ICE and RTCWeb Transport documents should specify a clear upper
 bound on the amount of non congestion controlled traffic an browser or
-applications should be limited to. The transportand perhaps security
+applications should be limited to. The transported perhaps security
 area should provide advice on what that number should be. WebRTC
 basically application work better the larger that number is at the
 expense of other applications running on the same congested links.
@@ -250,7 +250,7 @@ browser.
 The speed of NATs mapping creation going forward in the future is
 likely adequate to move the pacing to 5ms. However applications that
 create parallel peer connections or situations where more than a
-handfull of PeerConnections are forming in parallel in the same
+handful of PeerConnections are forming in parallel in the same
 browser (possibly in different tabs or web pages) need to be avoided.
 
 From a bandwidth limit point of view, if the bandwidth is limited at
@@ -269,7 +269,7 @@ Many thanks to review from ...
 
 # Appendix A - Bandwidth testing
 
-The following example web page was used to measure how much bandwith a
+The following example web page was used to measure how much bandwidth a
 browser will send to an arbitrary IP and port when getting 100% packet
 loss to that destination.
 
