@@ -63,7 +63,7 @@ Browser do not limit the number of PeerConnections but do limit the
 total amount of STUN traffic that is sent with no congestion
 control. This draft assumes that browsers will limit this traffic to
 250kbps thought right now implementation seems to exceed that when
-measured over an 100ms window. 
+measured over an 100ms window.
 
 Each PeerConnection starts a new STUN transaction periodically until
 all the iCE testing is done. [@!RFC5245] limits this to be 20ms or more
@@ -173,15 +173,14 @@ texted NATs moving the ICE pacing to 5ms.
 
 At the time [@RFC5389] was done, the argument made was it was OK for
 STUN to use as much non congestion controlled bandwidth as RTP audio
-was likely to do as the STUN was merely setting up a connection for
-an RTP phone call. The premise was the networks that IP Phones were used on were
-designed to have enough bandwidth to reasonable work with the audio
-codecs being used and that the RTP audio was not elastic and not
+was likely to do as the STUN was merely setting up a connection for an
+RTP phone call. The premise was the networks that IP Phones were used
+on were designed to have enough bandwidth to reasonable work with the
+audio codecs being used and that the RTP audio was not elastic and not
 congestion controlled in most implementations. There was a form of
-"User congestion control" in that if your phone call sounded like
-crap because it was having 10% packet loss, the user ended the call,
-tried again, and if it was till bad gave up and stopped causing
-congestion.
+"User congestion control" in that if your phone call sounded like crap
+because it was having 10% packet loss, the user ended the call, tried
+again, and if it was till bad gave up and stopped causing congestion.
 
 Since that time the number of candidates used in ICE has
 siginpificantly increased, the range of networks ICE is used over has
@@ -225,7 +224,8 @@ transport implication in how it interacts with other traffic on the
 networks that are close to or less than this limit.
 
 More information on this topic can be found in
-[@I-D.ietf-tsvwg-rfc5405bis] and [@I-D.ietf-avtcore-rtp-circuit-breakers].
+[@I-D.ietf-tsvwg-rfc5405bis] and
+[@I-D.ietf-avtcore-rtp-circuit-breakers].
 
 
 ## Rate Limits
@@ -254,19 +254,19 @@ some information indicates these windows are being reduced as time
 goes on to possible provide better a short attack window for certain
 types of attacks.  ICE takes advantage of both one side sending a
 suicide packet that will be lost but will create a short window of
-time where if the other side sends a packet it will get in a the window
-created by the suicide packet and allow a full connection to
+time where if the other side sends a packet it will get in a the
+window created by the suicide packet and allow a full connection to
 form. To make this work, the timing of the packets from either side
 needs to be closely coordinated. Most the complexity of the ICE
-algorithm comes from trying to coordinate both sides such that they send
-the related packets at similar times.
+algorithm comes from trying to coordinate both sides such that they
+send the related packets at similar times.
 
 A key implication of this is that if several ICE machine are running
 in single browser, what is happening in other ICE machine can't change
-the timing of what a given ICE machine is sending. So any solution that
-slowed down the transmission in one Peer Connection if there were lots
-of other simultaneous Peer Connection is not likely to work well with
-ICE unless the far side also knows to slow down.
+the timing of what a given ICE machine is sending. So any solution
+that slowed down the transmission in one Peer Connection if there were
+lots of other simultaneous Peer Connection is not likely to work well
+with ICE unless the far side also knows to slow down.
 
 
 # Recommendations
@@ -279,17 +279,17 @@ basically application work better the larger that number is at the
 expense of other applications running on the same congested links.
 
 Given the way that setting the ICE pacing to be too fast can cause ICE
-to fail, The Javascript application in WebRTC should have a way to tell
-the browser what ICE pacing to use with a minimum enforced by the
+to fail, The Javascript application in WebRTC should have a way to
+tell the browser what ICE pacing to use with a minimum enforced by the
 browser.
 
 There is no way for a JavaScript application to know how many other
 web pages or tabs in the browser are also doing stun yet all of these
 impact the global rate limit in the browser. If the browser discards
 STUN packets due to the global rate limit being exceeded, it results
-in applicant failures that look like network problems which are
-in fact just an artifact of other applications running the browser at
-the same time. This is critical information to understanding why
+in applicant failures that look like network problems which are in
+fact just an artifact of other applications running the browser at the
+same time. This is critical information to understanding why
 applications are failing. The recommendation here is that the WebRTC
 API be extended to provide a way for the browsers to inform the
 application using a given PeerConnection object if STUN packets it is
@@ -302,15 +302,14 @@ sending are being discarded by the browser.
 The speed of NATs mapping creation going forward in the future is
 likely adequate to move the pacing to 5ms. However applications that
 create parallel peer connections or situations where more than a
-handful of PeerConnections are forming in parallel in the same
-browser (possibly in different tabs or web pages) need to be avoided.
+handful of PeerConnections are forming in parallel in the same browser
+(possibly in different tabs or web pages) need to be avoided.
 
 From a bandwidth limit point of view, if the bandwidth is limited at
 250 kbps, a 5ms timing will work for a single PeerConnection but not
 much more than that. The specification should make developers aware of
 this limitation. If the non congestion controlled bandwidth limit is
-less than 250 kbps, a 5ms timing is likely too small to work
-reliably.
+less than 250 kbps, a 5ms timing is likely too small to work reliably.
 
 
 # Acknowledgments
@@ -322,9 +321,9 @@ Many thanks to review from ...
 
 # Appendix A - Bandwidth testing
 
-The following example web page was used to measure how much bandwidth a
-browser will send to an arbitrary IP and port when getting 100% packet
-loss to that destination.
+The following example web page was used to measure how much bandwidth
+a browser will send to an arbitrary IP and port when getting 100%
+packet loss to that destination.
 
 TODO - add program
 
