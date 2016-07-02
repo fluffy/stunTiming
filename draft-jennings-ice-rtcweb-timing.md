@@ -209,6 +209,10 @@ sends UDP traffic to an IP and port of specified in the JavaScript
 which the browser limits by dropping packets that exceed the global
 limit for the browser.
 
+It seems that the current plans for major browsers would allow the
+browser to 250 kbps of UDP traffic when there was 100% packet
+loss. Currently they send more than this. As far as I can tell there
+is specification defining what this limit should be in this case.
 
 ## What should global rate limit be
 
