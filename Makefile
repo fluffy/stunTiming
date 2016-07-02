@@ -26,7 +26,7 @@ clean:
 	$(xml2rfc) -N $< -o $@ --html
 
 $(DRAFT)-$(VERSION).xml: $(DRAFT).md 
-	mmark -xml2 -page -bib-id ~/bibxml/ -bib-rfc ~/bibxml/  $^ $@ 
+	mmark -xml2 -page -bib-id $(XML_LIBRARY)/ -bib-rfc ~/bibxml/  $^ $@ 
 
 $(DRAFT).diff.html: $(DRAFT)-$(VERSION).txt $(DRAFT)-old.txt 
 	htmlwdiff   $(DRAFT)-old.txt   $(DRAFT)-$(VERSION).txt >   $(DRAFT).diff.html

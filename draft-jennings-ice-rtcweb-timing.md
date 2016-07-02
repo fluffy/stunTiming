@@ -259,7 +259,7 @@ created by the suicide packet and allow a full connection to
 form. To make this work, the timing of the packets from either side
 needs to be closely coordinated. Most the complexity of the ICE
 algorithm comes from trying to coordinate both sides such that they send
-the related packets at simular times.
+the related packets at similar times.
 
 A key implication of this is that if several ICE machine are running
 in single browser, what is happening in other ICE machine can't change
@@ -287,7 +287,7 @@ There is no way for a JavaScript application to know how many other
 web pages or tabs in the browser are also doing stun yet all of these
 impact the global rate limit in the browser. If the browser discards
 STUN packets due to the global rate limit being exceeded, it results
-in applicant failusers that look like network problems which are
+in applicant failures that look like network problems which are
 in fact just an artifact of other applications running the browser at
 the same time. This is critical information to understanding why
 applications are failing. The recommendation here is that the WebRTC
