@@ -51,7 +51,6 @@ questions that have been raised about this are 1) can the NATs create
 new connections fast enough to not cause problems 2) what will the
 impact on bandwidth usage be.
 
-TODO - fix all refs 
 
 # Background
 
@@ -67,19 +66,19 @@ control. This draft assumes that browsers will limit this traffic to
 measured over an 100ms window. 
 
 Each PeerConnection starts a new STUN transaction periodically until
-all the iCE testing is done. RFC5245 limits this to be 20ms or more
-while draft-ietf-ice-rfc5245bis proposes moves the minimum time to 5
+all the iCE testing is done. [@!RFC5245] limits this to be 20ms or more
+while [@I-D.ietf-ice-rfc5245bis] proposes moves the minimum time to 5
 ms. Retransmission for previous stun transaction can be happening in
 parallel with this.
 
-The STUN specification [RFC5389] specifies 7 retransmission each one
+The STUN specification [@!RFC5389] specifies 7 retransmission each one
 doubling in timeout starting with a 500ms retransmission time unless
 certain conditions are meant. This was only put in the RFC to make the
 IESG happy and is largely ignored and instead system several
-retransmissions (6 for Firefox, 8 for Chome) with a retransmission
+retransmissions (6 for Firefox, 8 for Chrome) with a retransmission
 time starting at 100ms and doubling every retransmission up to a limit
 of 1600 ms for chrome where it stop increasing the time between
-retransmitions. 
+retransmissions. 
 
 The size of STUN packets can vary based on a variety of options
 selected but the packets being used by browser today are about 70 
@@ -103,10 +102,10 @@ new PeerConnections - one to each existing participant.
 This might result in 9 ICE machine each starting a new STUN
 transaction every 5 ms. Assuming no retransmissions, that is a new NAT
 mapping every 5ms / 9 ice machine = 0.5 ms and about 5 ms / 9 ice
-machine * 70 bytes / packet * 8 bits per byte = TODO kbps. As many of
-the ICE candates are expected not to work, they will result in the
-full series of retransmitons which will up the bandwidth usage
-significatnly.
+machine * 70 bytes / packet * 8 bits per byte which comes to about 1
+mbps. As many of the ICE candidates are expected not to work, they will
+result in the full series of retransmitting which will up the bandwidth
+usage significantly.
 
 An alternative design would be to form these connection to the 9
 people in the conference sequentially. Given the bandwidth limitations
@@ -115,10 +114,15 @@ the pacing to 5ms, the WebRTC drafts probably need to caution
 developers that parallel implementation with these many peers are
 likely to have failures.
 
+With the current timings, doing this in parallel often works and
+there are applications that do it in parallel that ill likely need
+to change if the timing change.
+
+
 # Nat Connection Rate Results
 
 The first set of tests are concerned with how many new mappings the
-NAT can create. The 20ms limit in [RFC5389] was based on going faster
+NAT can create. The 20ms limit in [@RFC5389] was based on going faster
 than than exceeded the rate of which NATs widely deployed at that time
 could create new mappings.
 
@@ -144,7 +148,7 @@ port. The second test created many new mappings to measure the maximum
 rate mapping could reliably be made.
 
 The conclusion of the first test was that all of the NATs tested were
-behave complaint (for UDP) with [RFC4787] with regards to mapping and
+behave complaint (for UDP) with [@RFC4787] with regards to mapping and
 filtering allocations. This is great news as well as a strong
 endorsement on the success of the BEHAVE WG. The fact that we see a
 non trivial percentage of non behave compliant NATs deployed in the
@@ -156,21 +160,18 @@ On the second test, all the NATs tested could reliably create new
 mapping in under 1ms - often more like several hundred micro
 seconds. Looking at the code of one NAT, this largely seems to be due
 to vast increase in CPU speed of CPUs in the NATs vs the speed in the
-NATs tested in 2005 in [draft-jennings-behave-test-results-00].
+NATs tested in 2005 in [@I-D.jennings-behave-test-results].
 
 This implies that as long as there or less than 5 or 10 PC doing ICE
 in parallel in a given browser, we do not anticipate problems on the
 texted NATs moving the ICE pacing to 5ms.
-
-TODO - length of open window for reply is shrinking
-
 
 
 # ICE Bandwidth Usage
 
 ## History of RFC 5389
 
-At the time [RFC5389] was done, the argument made was it was OK for
+At the time [@RFC5389] was done, the argument made was it was OK for
 STUN to use as much non congestion controlled bandwidth as RTP audio
 was likely to do as the STUN was merely setting up a connection for
 an RTP phone call. The premise was the networks that IP Phones were used on were
@@ -188,8 +189,9 @@ expanded, and uses have increased. We have also seem much more
 widespread use of FEC that that allows high packet loss rate with no
 impact on the end user perception of media quality. In WebRC there
 applications such as file sharing and background P2P backup that form
-data channel connecting using ICE with no human interaction. ICE in
-practical usage has expanded beyond a tool for IP phones to the
+data channel connecting using ICE with no human interaction to stop if
+the packet loss rate is high. ICE in
+practical usage has expanded beyond a tool for IP phones to become  the
 preferred tool on the internet for setting up end to end connection.
 
 
@@ -222,8 +224,8 @@ use this to send traffic to DDOS an UDP server. The limit has
 transport implication in how it interacts with other traffic on the
 networks that are close to or less than this limit.
 
-TODO - Look at draft-ietf-tsvwg-rfc5405bis
-draft-ietf-avtcore-rtp-circuit-breakers)
+More information on this topic can be found in
+[@I-D.ietf-tsvwg-rfc5405bis] and [@I-D.ietf-avtcore-rtp-circuit-breakers].
 
 
 ## Rate Limits
@@ -243,29 +245,27 @@ bitrates, (12 to 40 kbps depending on who you ask), it is clear that
 arbitrarily discarded by the browser rate limit before even being sent
 on the wire.
 
-## ICE Syncronization
+## ICE Synchronization
 
-TODO
-
-NATs and firewalls create very short windows of time where a repsonse
+NATs and firewalls create very short windows of time where a response
 to an outbound request is allowed to in and allowed to create a new
 flow. Though this draft did not test these timing on major firewalls,
-some information indicates these windows are reing reduced as time
+some information indicates these windows are being reduced as time
 goes on to possible provide better a short attack window for certain
 types of attacks.  ICE takes advantage of both one side sending a
 suicide packet that will be lost but will create a short window of
 time where if the other side sends a packet it will get in a the window
-created by the sucidided packet and allow a full connection to
+created by the suicide packet and allow a full connection to
 form. To make this work, the timing of the packets from either side
 needs to be closely coordinated. Most the complexity of the ICE
-alogirhtm comes from tryig to cooridate both sides such that they send
+algorithm comes from trying to coordinate both sides such that they send
 the related packets at simular times.
 
 A key implication of this is that if several ICE machine are running
-in single browser, what is happening in other ICE machine can't cahnge
-the timing of what a given ICE machine is sending. So any soltion that
-slowed down the transmition in one Peer Connection if there were lots
-of other simultanous Peer Connection is not likely to work well with
+in single browser, what is happening in other ICE machine can't change
+the timing of what a given ICE machine is sending. So any solution that
+slowed down the transmission in one Peer Connection if there were lots
+of other simultaneous Peer Connection is not likely to work well with
 ICE unless the far side also knows to slow down.
 
 
@@ -286,12 +286,12 @@ browser.
 There is no way for a JavaScript application to know how many other
 web pages or tabs in the browser are also doing stun yet all of these
 impact the global rate limit in the browser. If the browser discards
-STUN packets due to the gloabl rate limit being exceeded, it results
-in appliciaont failusers that look like network problems which are
-infact just an artifact of toher applictaions running the brwoser at
+STUN packets due to the global rate limit being exceeded, it results
+in applicant failusers that look like network problems which are
+in fact just an artifact of other applications running the browser at
 the same time. This is critical information to understanding why
-applications are failing. The recomendation here is that the WebRTC
-API be extended to provide a way for the browers to inform the
+applications are failing. The recommendation here is that the WebRTC
+API be extended to provide a way for the browsers to inform the
 application using a given PeerConnection object if STUN packets it is
 sending are being discarded by the browser.
 
@@ -316,8 +316,6 @@ reliably.
 # Acknowledgments
 
 Many thanks to review from ...
-
-TODO - Fix refernces
 
 
 {backmatter}

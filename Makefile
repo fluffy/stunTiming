@@ -20,13 +20,13 @@ clean:
 	-rm -f $(DRAFT)-$(VERSION).{txt,html,xml,pdf} $(DRAFT).diff.html
 
 %.txt: %.xml
-	$(xml2rfc) $< -o $@ --text
+	$(xml2rfc) -N $< -o $@ --text
 
 %.html: %.xml
-	$(xml2rfc) $< -o $@ --html
+	$(xml2rfc) -N $< -o $@ --html
 
 $(DRAFT)-$(VERSION).xml: $(DRAFT).md 
-	mmark -xml2 -page $^ $@ 
+	mmark -xml2 -page -bib-id ~/bibxml/ -bib-rfc ~/bibxml/  $^ $@ 
 
 $(DRAFT).diff.html: $(DRAFT)-$(VERSION).txt $(DRAFT)-old.txt 
 	htmlwdiff   $(DRAFT)-old.txt   $(DRAFT)-$(VERSION).txt >   $(DRAFT).diff.html
