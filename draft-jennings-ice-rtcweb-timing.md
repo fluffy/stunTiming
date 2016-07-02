@@ -10,7 +10,7 @@
 
     Title = "ICE and STUN Timing Experiments for WebRTC"
     abbrev = "ICE Timing Experiments"
-    category = "std"
+    category = "info"
     docName = "draft-jennings-ice-rtcweb-timing-00"
     ipr= "trust200902"
     area = "Internet"
@@ -19,6 +19,7 @@
     [pi]
     symrefs = "yes"
     sortrefs = "yes"
+	toc = "yes"
 
     [[author]]
     initials = "C."
@@ -34,11 +35,12 @@
 .# Abstract
 
 This draft summarizes the results in some experiments looking at the
-impact of proposed changes to  ICE based on the latest
-consumer NATs.
+impact of proposed changes to ICE based on the latest consumer
+NATs. It looks and the amount of non congestion controlled bandwidth a
+browser can use and the impacts of that on ICE timing.
 
-This draft is not meant to  become an RFC. It is purely
-information to help guide development of other specifications.
+This draft is not meant to become an RFC. It is purely information to
+help guide development of other specifications.
 
 
 {mainmatter}
@@ -66,10 +68,10 @@ control. This draft assumes that browsers will limit this traffic to
 measured over an 100ms window.
 
 Each PeerConnection starts a new STUN transaction periodically until
-all the iCE testing is done. [@!RFC5245] limits this to be 20ms or more
-while [@I-D.ietf-ice-rfc5245bis] proposes moves the minimum time to 5
-ms. Retransmission for previous stun transaction can be happening in
-parallel with this.
+all the iCE testing is done. [@!RFC5245] limits this to be 20ms or
+more while [@I-D.ietf-ice-rfc5245bis] proposes moves the minimum time
+to 5 ms. Retransmission for previous stun transaction can be happening
+in parallel with this.
 
 The STUN specification [@!RFC5389] specifies 7 retransmission each one
 doubling in timeout starting with a 500ms retransmission time unless
@@ -78,11 +80,11 @@ IESG happy and is largely ignored and instead system several
 retransmissions (6 for Firefox, 8 for Chrome) with a retransmission
 time starting at 100ms and doubling every retransmission up to a limit
 of 1600 ms for chrome where it stop increasing the time between
-retransmissions. 
+retransmissions.
 
 The size of STUN packets can vary based on a variety of options
-selected but the packets being used by browser today are about 70 
-bytes for the the requests. 
+selected but the packets being used by browser today are about 70
+bytes for the the requests.
 
 As the speed of the pacing is speeded up to 5ms, it increases the
 number of new mappings the NAT needs to create as well as increasing
@@ -103,9 +105,9 @@ This might result in 9 ICE machine each starting a new STUN
 transaction every 5 ms. Assuming no retransmissions, that is a new NAT
 mapping every 5ms / 9 ice machine = 0.5 ms and about 5 ms / 9 ice
 machine * 70 bytes / packet * 8 bits per byte which comes to about 1
-mbps. As many of the ICE candidates are expected not to work, they will
-result in the full series of retransmitting which will up the bandwidth
-usage significantly.
+mbps. As many of the ICE candidates are expected not to work, they
+will result in the full series of retransmitting which will up the
+bandwidth usage significantly.
 
 An alternative design would be to form these connection to the 9
 people in the conference sequentially. Given the bandwidth limitations
@@ -114,9 +116,9 @@ the pacing to 5ms, the WebRTC drafts probably need to caution
 developers that parallel implementation with these many peers are
 likely to have failures.
 
-With the current timings, doing this in parallel often works and
-there are applications that do it in parallel that ill likely need
-to change if the timing change.
+With the current timings, doing this in parallel often works and there
+are applications that do it in parallel that ill likely need to change
+if the timing change.
 
 
 # Nat Connection Rate Results
@@ -182,16 +184,16 @@ congestion controlled in most implementations. There was a form of
 because it was having 10% packet loss, the user ended the call, tried
 again, and if it was till bad gave up and stopped causing congestion.
 
-Since that time the number of candidates used in ICE has
-siginpificantly increased, the range of networks ICE is used over has
-expanded, and uses have increased. We have also seem much more
-widespread use of FEC that that allows high packet loss rate with no
-impact on the end user perception of media quality. In WebRC there
-applications such as file sharing and background P2P backup that form
-data channel connecting using ICE with no human interaction to stop if
-the packet loss rate is high. ICE in
-practical usage has expanded beyond a tool for IP phones to become  the
-preferred tool on the internet for setting up end to end connection.
+Since that time the number of candidates used in ICE has significantly
+increased, the range of networks ICE is used over has expanded, and
+uses have increased. We have also seem much more widespread use of FEC
+that that allows high packet loss rate with no impact on the end user
+perception of media quality. In WebRC there applications such as file
+sharing and background P2P backup that form data channel connecting
+using ICE with no human interaction to stop if the packet loss rate is
+high. ICE in practical usage has expanded beyond a tool for IP phones
+to become the preferred tool on the internet for setting up end to end
+connection.
 
 
 
@@ -203,9 +205,10 @@ an unspecified number but seems that browsers currently plan to set
 this to 250 kbps. An advertisement running on a popular webpage can
 create as many PeerConnections as it wants and specify the IP and port
 to send all the STUN transaction to. Each Peer Connection objects
-sends UDP traffic to an IP and port of specified in the JavaScript which the
-browser limits by dropping packets that exceed the global limit for
-the browser.
+sends UDP traffic to an IP and port of specified in the JavaScript
+which the browser limits by dropping packets that exceed the global
+limit for the browser.
+
 
 ## What should global rate limit be
 
@@ -315,7 +318,6 @@ less than 250 kbps, a 5ms timing is likely too small to work reliably.
 # Acknowledgments
 
 Many thanks to review from ...
-
 
 {backmatter}
 
