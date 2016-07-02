@@ -329,7 +329,59 @@ Many thanks to review from ...
 
 The following example web page was used to measure how much bandwidth
 a browser will send to an arbitrary IP and port when getting 100%
-packet loss to that destination.
+packet loss to that destination. It creates 100 Peer Connections that
+all send STUN traffic to port 10053 at 10.1.2.3. It them creates a
+single data channel for each one and starts the ICE machine by
+creating an offer setting that to be the local SDP. 
 
-TODO - add program
+
+```
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta charset="utf-8">
+    <title> STUN traffic demo </title>
+</head>
+<body>
+    <h2> This is STUN traffic demo </h2>
+    <p>
+	grab traffic with:
+	sudo tcpdump -i en1 -s 0 -w /tmp/dump.pcap 'port 10053'
+	</p>
+
+    <script>
+        var pc = new Array(100);
+        var i = 0;
+
+        function setupPC(lpc) {
+            lpc.createDataChannel("myData");
+            lpc.createOffer().then(function(offer) {
+                return lpc.setLocalDescription(offer);
+            });
+        }
+
+        var configuration = {
+            iceServers: [{
+                urls: 'stun:10.1.2.3:10053'
+            }]
+        };
+        for (i = 0; i < pc.length; i += 1) {
+            if (navigator.mozGetUserMedia) {
+                pc[i] = new RTCPeerConnection(configuration);
+            } else { // assume it is chrome 
+                pc[i] = new webkitRTCPeerConnection(configuration);
+            }
+
+            setupPC(pc[i]);
+        }
+    </script>
+
+</body>
+
+</html>
+
+```
+
 
