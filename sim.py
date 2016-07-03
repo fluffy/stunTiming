@@ -88,6 +88,7 @@ OUT.write("TIME\tRATE\n")
 
 for s in SLICES:
     t = T * TIME_SLICE
+    T += 1
     r = (s * args.packet_size * 8) * (1000/TIME_SLICE)
     OUT.write("%d\t%d\n"%(t, r))
 
