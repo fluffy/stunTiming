@@ -75,11 +75,15 @@ in parallel with this.
 
 The STUN specification [@!RFC5389] specifies 7 retransmission each one
 doubling in timeout starting with a 500ms retransmission time unless
-certain conditions are meant. This was only put in the RFC to make the
-IESG happy and is largely ignored and instead system several
+certain conditions are meant. This was put in the RFC to meet the
+requirements of the 
+IESG from long ago and is largely ignored by existing
+implementations. Instead system do several
 retransmissions (6 for Firefox, 8 for Chrome) with a retransmission
-time starting at 100ms and doubling every retransmission up to a limit
-of 1600 ms for chrome where it stop increasing the time between
+time starting at 100ms and doubling every retransmission. Often there
+is a limit of how the maximum retransmission time.  Chrome for example
+only doubles the retransmission time up to a limit of 
+1600 ms for chrome where it stop increasing the time between
 retransmissions.
 
 The size of STUN packets can vary based on a variety of options
@@ -94,7 +98,8 @@ the non congestion controlled bandwidth used by by the browser. The
 rest of this draft looks at what sort of issue may or may not come out
 of this.
 
-Additional information about ICE in WebRTC can be found in [@I-D.thomson-mmusic-ice-webrtc].
+Additional information about ICE in WebRTC can be found in
+[@I-D.thomson-mmusic-ice-webrtc].
 
 ## A multi PC use case
 
@@ -105,13 +110,14 @@ results. If there are 9 people on a conference call and a 10th one
 joins, one design might be for the new person to in parallel form 9
 new PeerConnections - one to each existing participant.
 
-This might result in 9 ICE machine each starting a new STUN
+This might result in 9 ICE agent each starting a new STUN
 transaction every 5 ms. Assuming no retransmissions, that is a new NAT
-mapping every 5ms / 9 ice machine = 0.5 ms and about 5 ms / 9 ice
-machine * 70 bytes / packet * 8 bits per byte which comes to about 1
+mapping every 5ms / 9 ICE agent = 0.5 ms and about 5 ms / 9 ICE
+agent * 70 bytes / packet * 8 bits per byte which comes to about 1
 mbps. As many of the ICE candidates are expected not to work, they
 will result in the full series of retransmitting which will up the
-bandwidth usage significantly.
+bandwidth usage significantly. The browser would rate limit this
+traffic by dropping some of it. 
 
 An alternative design would be to form these connection to the 9
 people in the conference sequentially. Given the bandwidth limitations
@@ -164,8 +170,12 @@ should see a reduced use of TURN servers over time.
 
 On the second test, all the NATs tested could reliably create new
 mapping in under 1ms - often more like several hundred micro
-seconds. Looking at the code of one NAT, this largely seems to be due
-to vast increase in CPU speed of CPUs in the NATs vs the speed in the
+seconds. The NATs do drop packets if the rate of new mapping gets too
+high but for all the NATs tested, this rate was faster than 1000
+mappings per second. Looking at the code of one NAT,
+this largely seems to be due
+to large increase in clock speed of the CPUs
+in the NATs tested here vs the speed in the
 NATs tested in 2005 in [@I-D.jennings-behave-test-results].
 
 This implies that as long as there or less than 5 or 10 PC doing ICE
@@ -219,14 +229,14 @@ limit for the browser.
 It is clear that sending 250 kbps on 80 kbps edge cellular connection
 severely impacts other application on that connection and is not even
 remotely close to TCP friendly. In the age of cellular wifi hot spots
-and highly variable backhaul, the browser has no pre installed idea of
+and highly variable backhaul, the browser has very little idea of
 what the available bandwidth is.
 
 This draft is not in anyway suggesting what the bandwidth limit should
 be but it is looking at what are the implication to ICE timing based
 on that number. The limit has security implication in that browser
 loading Javascript in paid advertisements on popular web sides could
-use this to send traffic to DDOS an UDP server. The limit has
+use this to send traffic to DDOS an server. The limit has
 transport implication in how it interacts with other traffic on the
 networks that are close to or less than this limit.
 
@@ -237,20 +247,35 @@ More information on this topic can be found in
 
 ## Rate Limits
 
-This limit to drop packets if the global bandwidth is exceeded means
+Having a global bandwidth limit for the browser, which if exceeded
+will dorp packets,  means
 that applications need to stay under this rate limit or the loss of
-STUN packets will cause ICE to start thinking connections which are
-valid do not work. At 250 kbps, split across say two web pages, with
-no retransmission, each web page can from a new STUN transaction
-roughly ever ( 70 * 8 ) / (250000 / 2 )= 4.48 ms. This implies that
-really only one Peer Connection can be doing ICE at at time if the
-pacing is moved to 5 ms.
+STUN packets will cause ICE to start mistakenly thinking there is
+no connectivity
+on flows which do not work. Consider the case with two NICs (cellular
+and wifi), each with an v4 and v6 address, and a reachable TURN server
+on each. This gives 12 candidates and if the other side is the same
+there are six v6 addresses matching on the other side so 36 pairs
+for v6 
+and the same for v4 resulting in 72 pairs for ICE to check (assuming
+full bundle, rtcp mux etc). The number of pairs we will see in
+practice in the futre is a somewhat controversial topic and the 72
+here was a number pulled out of a hat and not based on any real
+tests. There is probably a better number to use. 
 
-If the rate limit was set more around compressed narrowband voice
-bitrates, (12 to 40 kbps depending on who you ask), it is clear that
-5ms timing fro ICE is far too low and will cause many ICE packet to be
-arbitrarily discarded by the browser rate limit before even being sent
-on the wire.
+A simple simulation on this where none of the connections works sugest
+that the peak bandwidth in 100ms windows is about 112kbps if the
+pacing is 20 ms while it goes to about 290kbps if the pacing is 5
+ms. This is the bandwidth used by a single ICE agent and there could
+easily be multiple ICE agents running at the same time in the same tab
+or across different tabs in the browser.
+
+The point I am trying to get at with this is that if the global rate
+limit would need to be much higher than 250 kbps to move to a 5 ms
+pacing and have it reliably work with multiple things happening at the same time
+in the browser. 
+
+
 
 ## ICE Synchronization
 
@@ -268,27 +293,37 @@ needs to be closely coordinated. Most the complexity of the ICE
 algorithm comes from trying to coordinate both sides such that they
 send the related packets at similar times.
 
-A key implication of this is that if several ICE machine are running
-in single browser, what is happening in other ICE machine can't change
-the timing of what a given ICE machine is sending. So any solution
+A key implication of this is that if several ICE agent are running
+in single browser, what is happening in other ICE agent can't change
+the timing of what a given ICE agent is sending. Or at least the
+amount of skew introduced can't cause the packets to fall outside the
+timing widows from the NATs and Firewalls. So any solution
 that slowed down the transmission in one Peer Connection if there were
-lots of other simultaneous Peer Connection is not likely to work well
-with ICE unless the far side also knows to slow down.
+lots of other simultaneous Peer Connection may have issues
+unless the far side also knows to slow down.
 
+Figuring out how much the timing can be skewed between the two sides
+requires measuring how long the window is open on the NATs and
+firewalls.
+Currently
+we do not have good measurements of this timing and it is not possible
+to evaluate how much this is an issue without that information. 
 
 # Recommendations
 
 The ICE and RTCWeb Transport documents should specify a clear upper
 bound on the amount of non congestion controlled traffic an browser or
-applications should be limited to. The transported perhaps security
+applications should be limited to. The transport and  perhaps security
 area should provide advice on what that number should be. WebRTC
 basically application work better the larger that number is at the
 expense of other applications running on the same congested links.
 
+<!--
 Given the way that setting the ICE pacing to be too fast can cause ICE
 to fail, The Javascript application in WebRTC should have a way to
 tell the browser what ICE pacing to use with a minimum enforced by the
 browser.
+-->
 
 There is no way for a JavaScript application to know how many other
 web pages or tabs in the browser are also doing stun yet all of these
@@ -299,12 +334,24 @@ fact just an artifact of other applications running the browser at the
 same time. This is critical information to understanding why
 applications are failing. The recommendation here is that the WebRTC
 API be extended to provide a way for the browsers to inform the
-application using a given PeerConnection object if STUN packets it is
+application using a given PeerConnection object
+if STUN packets that PeerConnection  is
 sending are being discarded by the browser.
 
+# Future work
 
+It would be nice to collect measurements on how long NATs and
+Firewalls keep mapping with no response open. It would be nice to
+simulate how much global pacing would introduce skew the timing of
+ICE packets and if that would reduce non relay connectivity success
+rates. 
 
 # Conclusions
+
+The combination of a low ICE pace timing, lots of Peer Connections, 
+and many candidates will cause problems. The optimal way to balance
+this depends on the factors such as what how much non congestion 
+controlled bandwidth we should assume is available. 
 
 The speed of NATs mapping creation going forward in the future is
 likely adequate to move the pacing to 5ms. However applications that
@@ -316,12 +363,14 @@ From a bandwidth limit point of view, if the bandwidth is limited at
 250 kbps, a 5ms timing will work for a single PeerConnection but not
 much more than that. The specification should make developers aware of
 this limitation. If the non congestion controlled bandwidth limit is
-less than 250 kbps, a 5ms timing is likely too small to work reliably.
+less than 250 kbps, a 5ms timing is likely too small to work reliably
+particularly with multiple ICE agents running in the browser. 
 
 
 # Acknowledgments
 
-Many thanks to review from ...
+Many thanks to review from Eric Rescorla for review and simple
+simulator and to Ari Keränen, and Harald Alvestrand.
 
 {backmatter}
 

@@ -36,10 +36,10 @@ class Pair(object):
         if self.transmissions_ >= self.num_retransmits_:
             return False
         self.transmissions_ += 1
+        self.next_time_ += self.timeout_
         self.timeout_ *= 2
         if self.timeout_ > self.max_timeout_:
             self.timeout_ = self.max_timeout_
-        self.next_time_ += self.timeout_
         return True
         
     def run(self):
@@ -49,15 +49,12 @@ class Pair(object):
         
         
 
-
-
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--start_interval', dest = 'start_interval', type=int, default = 20)
 parser.add_argument('--start_timeout', dest = 'start_timeout', type=int, default = 100)
 parser.add_argument('--num_retransmits', dest = 'num_retransmits', type=int, default=6)
 parser.add_argument('--max_timeout', dest='max_timeout', type=int, default=1600)
-parser.add_argument('--num_pairs', dest='num_pairs', type=int, default=1)
+parser.add_argument('--num_pairs', dest='num_pairs', type=int, default=15)
 parser.add_argument('--packet_size', dest='packet_size', type=int, default=70)
 
 args = parser.parse_args()
@@ -91,6 +88,8 @@ for s in SLICES:
     T += 1
     r = (s * args.packet_size * 8) * (1000/TIME_SLICE)
     OUT.write("%d\t%d\n"%(t, r))
+
+debug(  "initial bandwidth %s kbps" %( SLICES[0] * args.packet_size * 8  / TIME_SLICE) )
 
         
 
