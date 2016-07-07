@@ -248,7 +248,7 @@ More information on this topic can be found in
 ## Rate Limits
 
 Having a global bandwidth limit for the browser, which if exceeded
-will dorp packets,  means
+will drop packets,  means
 that applications need to stay under this rate limit or the loss of
 STUN packets will cause ICE to start mistakenly thinking there is
 no connectivity
@@ -258,12 +258,12 @@ on each. This gives 12 candidates and if the other side is the same
 there are six v6 addresses matching on the other side so 36 pairs
 for v6 
 and the same for v4 resulting in 72 pairs for ICE to check (assuming
-full bundle, rtcp mux etc). The number of pairs we will see in
-practice in the futre is a somewhat controversial topic and the 72
+full bundle, RTCP mux etc). The number of pairs we will see in
+practice in the future is a somewhat controversial topic and the 72
 here was a number pulled out of a hat and not based on any real
 tests. There is probably a better number to use. 
 
-A simple simulation on this where none of the connections works sugest
+A simple simulation on this where none of the connections works suggests
 that the peak bandwidth in 100ms windows is about 112kbps if the
 pacing is 20 ms while it goes to about 290kbps if the pacing is 5
 ms. This is the bandwidth used by a single ICE agent and there could
