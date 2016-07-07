@@ -57,7 +57,7 @@ impact on bandwidth usage be.
 # Background
 
 A web page using WebRTC can form multiple PeerConnections. Each one of
-these starts an ICE process that imitates STUN transactions towards
+these starts an ICE process that  initiates  STUN transactions towards
 various IP and ports that are specified by the Javascript of the web
 page.
 
@@ -83,14 +83,18 @@ of 1600 ms for chrome where it stop increasing the time between
 retransmissions.
 
 The size of STUN packets can vary based on a variety of options
-selected but the packets being used by browser today are about 70
-bytes for the the requests.
+selected but the packets being used by browser today for IPv4  are about 70
+bytes for the STUN requests. (Note: some other drafts have
+significantly higher numbers for this size so some investigation is
+likely needed to determine what the correct number is)
 
 As the speed of the pacing is speeded up to 5ms, it increases the
 number of new mappings the NAT needs to create as well as increasing
 the non congestion controlled bandwidth used by by the browser. The
 rest of this draft looks at what sort of issue may or may not come out
 of this.
+
+Additional information about ICE in WebRTC can be found in [@I-D.thomson-mmusic-ice-webrtc].
 
 ## A multi PC use case
 
