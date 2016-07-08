@@ -11,7 +11,7 @@
     Title = "ICE and STUN Timing Experiments for WebRTC"
     abbrev = "ICE Timing Experiments"
     category = "info"
-    docName = "draft-jennings-ice-rtcweb-timing-00"
+    docName = "draft-jennings-ice-rtcweb-timing-01"
     ipr= "trust200902"
     area = "Internet"
     keyword = ["ICE", "STUN", "WebRTC" ]
