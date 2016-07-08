@@ -285,7 +285,10 @@ in the browser.
 
 NATs and firewalls create very short windows of time where a response
 to an outbound request is allowed to in and allowed to create a new
-flow. Though this draft did not test these timing on major firewalls,
+flow.
+(We do not have current  measurements of this but
+suspect the time is in the order of 500 ms to 5 seconds ).
+Though this draft did not test these timing on major firewalls,
 some information indicates these windows are being reduced as time
 goes on to possible provide better a short attack window for certain
 types of attacks.  ICE takes advantage of both one side sending a
