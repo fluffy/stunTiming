@@ -50,12 +50,12 @@ class Pair(object):
         
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--start_interval', dest = 'start_interval', type=int, default = 20)
+parser.add_argument('--start_interval', dest = 'start_interval', type=int, default = 5)
 parser.add_argument('--start_timeout', dest = 'start_timeout', type=int, default = 100)
 parser.add_argument('--num_retransmits', dest = 'num_retransmits', type=int, default=6)
 parser.add_argument('--max_timeout', dest='max_timeout', type=int, default=1600)
-parser.add_argument('--num_pairs', dest='num_pairs', type=int, default=15)
-parser.add_argument('--packet_size', dest='packet_size', type=int, default=70)
+parser.add_argument('--num_pairs', dest='num_pairs', type=int, default=72)
+parser.add_argument('--packet_size', dest='packet_size', type=int, default=116)
 
 args = parser.parse_args()
 st = 0
